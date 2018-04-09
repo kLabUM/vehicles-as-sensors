@@ -10,7 +10,7 @@ strdate = '0811';
 dSamp = 12;         % down-sample rate, e.g., larger the value less accurate
 weight = 1;         % weights applied to the radar prior, e.g., 0.1, 0.5, 0.9
 
-strnc = strcat('./data/data_2014',strdate,'.nc');
+strnc = strcat('../data/data_2014',strdate,'.nc');
 
 ncdisp(strnc);
 radarData = ncread(strnc,'radar');
@@ -21,7 +21,7 @@ latNet = ncread(strnc,'latitude');
 
 radarData(isnan(radarData)) = 1e-9;
 
-strcsv = strcat('./data/camera_combined_filtered_2014',strdate,'_1min.csv');
+strcsv = strcat('../data/camera_combined_filtered_2014',strdate,'_1min.csv');
 vehicleData = csvread(strcsv,1,1);
 
 updatedmap = mapUpdate(weight,dSamp,vehicleData,radarData,lonNet,latNet);
