@@ -30,7 +30,7 @@ varPos = 0.0001;   		% decay as the distance between the windshield wiper measur
 
 % load data
 
-vehicleDataU = csvread('../data/camera_validation.csv',1,0);
+vehicleDataU = csvread('../data/camera_combined_filtered_20140811_3sec.csv',1,0);
 vehicleDataU(:,1) = round(vehicleDataU(:,1));
 
 % this eliminates duplicate rows
