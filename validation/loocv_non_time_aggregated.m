@@ -11,7 +11,7 @@ dSamp = 12;          % down-sample, e.g., 1/8, smaller the value, the more accur
 varInfo = 0.0001;     % how noisy the sensor is (e.g., 0: perfect) default 0.01....
 varPos = 0.0001;     % decay as the distance between the windshield wiper measurement and the source of rain, increases...
 
-vehicleDataU = csvread('./data/camera_combined_aditya.csv',1,0);
+vehicleDataU = csvread('../data/camera_validation.csv',1,0);
 vehicleDataU(:,1) = round(vehicleDataU(:,1));
 % this eliminates duplicate rows
 [~,vidt,vcdt]= unique(vehicleDataU(:,1:6),'rows');
@@ -27,11 +27,11 @@ wiperIx = 6 ;
 cameraIx = 7;
 
 % load netcdf data
-ncdisp('/Users/mdbartos/Data/combined_nc/data_20140811.nc');
-gageData = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','gage');
-radarData = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','radar');
-wiperData = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','wiper');
-timeData = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','time');
+ncdisp('../data/data_20140811.nc');
+gageData = ncread('../data/data_20140811.nc','gage');
+radarData = ncread('../data/data_20140811.nc','radar');
+wiperData = ncread('../data/data_20140811.nc','wiper');
+timeData = ncread('../data/data_20140811.nc','time');
 
 % covert timeData to milliseconds (begining from 12:00:00:000 am)
 for i = 1:length(timeData)
@@ -44,8 +44,8 @@ end
 %set radar data to zero if it's NaN
 radarData(isnan(radarData)) = 0;
 wiperData(isnan(wiperData)) = 0;
-lonNet = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','longitude');
-latNet = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','latitude');
+lonNet = ncread('../data/data_20140811.nc','longitude');
+latNet = ncread('../data/data_20140811.nc','latitude');
 
 % GPS locations to positions in [0,1]x[0,1] 
 vehicleData(:,5)=(vehicleData(:,5)-min(lonNet))./(max(lonNet) - min(lonNet));
@@ -59,9 +59,6 @@ for i = 1:size(radarData,3)
 end
 lon_size = size(radarTSeries{i},1);     % number of grids to represent longitude axis, e.g., 800
 lat_size = size(radarTSeries{i},2);     % number of grids to represent longitude axis, e.g., 299
-
-figure,
-spy(radarTSeries{200}')
 
 % generate information samples
 hSet2 = haltonset(1,'Skip',1e3,'Leap',1e2);
@@ -326,11 +323,12 @@ p4.Annotation.LegendInformation.IconDisplayStyle = 'off';
 
 ylabel('True Positive Rate (Sensitivity)');
 xlabel('False Positive Rate (1-Specificity)');
-% title('Product vs Radar: Time&Space-aggregated  (Tian)');
 
 axis('equal');
 axis([0 1 0 1]);
 set(gca,'FontSize',16);
+
+save('../data/roc_data.mat','compdata')
 
 %% display locations where vehicles meet (at common times)
 f0 = figure('position',[100 100  800 299],'Color',[1 1 1]);

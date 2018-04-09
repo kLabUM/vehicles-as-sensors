@@ -1,70 +1,51 @@
 % Spatial distribution estimation (SPE) using Bayesian Approach (MMLE + SIR filter)
-% Hyongju Park
+% Hyongju Park & Matt Bartos
 clear all;close all;clc
 %% 
 
-nsampInfo = 100;    % number of information sample
+nsampInfo = 100;     % number of information sample
 dSamp = 12;          % down-sample, e.g., 1/8, smaller the value, the more accurate
-%dSamp = 24;
 
-%varInfo = 0.01;     % how noisy the sensor is (e.g., 0: perfect) default 0.01....
 varInfo = 0.001;     % how noisy the sensor is (e.g., 0: perfect) default 0.01....
-varPos = 0.01;     % decay as the distance between the windshield wiper measurement and the source of rain, increases...
-weight = 0.9;		% weight on prior (e.g., if weight=1, it forgets about the prior measurements and only consider the new radar measurement, default: 0.9)
+varPos = 0.01;       % decay as the distance between the windshield wiper measurement and the source of rain, increases...
+weight = 0.9;		 % weight on prior (e.g., if weight=1, it forgets about the prior measurements and only consider the new radar measurement, default: 0.9)
 
-vehicleData = csvread('/Users/mdbartos/20140811_cameracombined_filtered.csv', 1, 1);
-%timeIx = 1;
-deviceIdIdx = 2 - 1; % 1
-tripIx = 3 - 1; % 2
-latIx = 4 - 1; % 3
-lonIx = 5 - 1; % 4
-wiperIx = 6 - 1; % 5
-gpsSpeedIx = 7 - 1; % 6
+vehicleData = csvread('../data/20140811_cameracombined_filtered.csv', 1, 1);
+deviceIdIdx = 2 - 1;
+tripIx = 3 - 1;      
+latIx = 4 - 1;       
+lonIx = 5 - 1;       
+wiperIx = 6 - 1;     
+gpsSpeedIx = 7 - 1;
 cameraIx = 8 - 1;
 radarIx = 9 - 1;
 gageIx = 10 - 1; 
-tStepIx = 11 - 1; % 7
-yStepIx = 12 - 1; % 8
-xStepIx = 13 - 1; % 9
+tStepIx = 11 - 1;
+yStepIx = 12 - 1;
+xStepIx = 13 - 1;
 
 allVehicleID = unique(vehicleData(:,deviceIdIdx))';
 numExcludedVehicles = 0;
 excludedVehicleID = allVehicleID(1,randsample(1:length(allVehicleID),numExcludedVehicles));
-% excludedVehicleID = 10153;
-% excludedVehicleID = 10159;
-% addpath(genpath('./gpml-matlab-v3.6-2015-07-07/'))
 
-
-ncdisp('/Users/mdbartos/Data/combined_nc/data_20140811.nc');
-gageData = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','gage');
-radarData = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','radar');
-wiperData = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','wiper');
+ncdisp('../data/data_20140811.nc');
+gageData = ncread('../data/data_20140811.nc','gage');
+radarData = ncread('../data/data_20140811.nc','radar');
+wiperData = ncread('../data/data_20140811.nc','wiper');
 
 %set radar data to zero if it's NaN
 radarData(isnan(radarData)) = 1e-9;
 wiperData(isnan(wiperData)) = 0;
-lonNet = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','longitude');
-latNet = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','latitude');
+lonNet = ncread('../data/data_20140811.nc','longitude');
+latNet = ncread('../data/data_20140811.nc','latitude');
 
 %% load data
-% ncdisp('/Users/mdbartos/Data/combined_nc/data_20140811.nc');
-% gageData = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','gage');
-% radarData = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','radar');
-% wiperData = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','wiper');
-% 
-% %set radar data to zero if it's NaN
-% radarData(isnan(radarData)) = 0;
-% wiperData(isnan(wiperData)) = 0;
-% lonNet = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','longitude');
-% latNet = ncread('/Users/mdbartos/Data/combined_nc/data_20140811.nc','latitude');
-
 % change scale (GPS locations -> [0, 1]x[0, 1]) % for the sake of convenience
 lonNetScaled=(lonNet-min(lonNet))/(max(lonNet) - min(lonNet));
 latNetScaled=(latNet-min(latNet))/(max(latNet) - min(latNet));
 
 %radius of rain detection for each vehicle (scaled based upon our scaled area [0, 1]x[0, 1])
 radD = 0.1;
-
 
 % generate timeseries data {radar, windshield wiper}
 for i = 1:size(radarData,3)
@@ -85,7 +66,6 @@ end
 for i = 1:length(radar_nz)
     radar_nz2(i) = radarIdx(i);
 end
-%===============NO NEED TO CHANGE ABOVE===========================
 
 % number of runs for a finite time horizeon
 nRuns = max(unique(vehicleData(:,end-2)));
@@ -97,19 +77,9 @@ for i= 1:size(radarTSeries{1},2)
     lvec = [lvec;repmat(latNetScaled(i),size(radarTSeries{1},1),1)];
 end
 M(:,2) = lvec;
-% % normalize
+% normalize
 M(:,3) = radarTSeries{1}(:);
-% 
-% % ++++++++++++PLOT++++++++++++
 [qx,qy,qz] = drawNoFigure(M,radarTSeries{1},dSamp);
-% [qx,qy,qz] = drawFigure(M,radarTSeries{1}/grandmax,dSamp);
-% ++++++++++++PLOT++++++++++++
-
-
-
-
-
-
 
 %%
 % clear M for later use...
@@ -131,14 +101,7 @@ end
 grandmax = max(maxes);
 
 % find maximum information...
-
-
-
-
-
-
 sampInfo = net(hScrambled2,nsampInfo) ;
-
 
 % apply different weights to priors:
 %   - prvWgt0: prior from radar measurements
@@ -160,8 +123,6 @@ particleWgt = sampInfo'*prvWgt;
 % update M using the weighted prior
 M(:,3) =particleWgt'/max(sampInfo);
 
-
-
 %%
 % ++++++++++++PLOT++++++++++++
 [qx,qy,qz] = drawFigure(M,radarTSeries{1},dSamp);
@@ -174,26 +135,23 @@ nRuns = max(unique(vehicleData(:,end-2)));
 
 %% create netcdf
 % 
-nccreate('product_20140811.nc','lat', 'Dimensions', {'lat', length(qx(1,:))});
+nccreate('../data/product_20140811.nc','lat', 'Dimensions', {'lat', length(qx(1,:))});
 ncwrite('product_20140811.nc','lat', linspace(min(latNet), max(latNet), length(qx(1,:))));
  
-nccreate('product_20140811.nc','lon', 'Dimensions', {'lon', length(qy(:,1))});
+nccreate('../data/product_20140811.nc','lon', 'Dimensions', {'lon', length(qy(:,1))});
 ncwrite('product_20140811.nc','lon', linspace(min(lonNet), max(lonNet), length(qy(:,1))));
  
-nccreate('product_20140811.nc','normmax');
+nccreate('../data/product_20140811.nc','normmax');
 ncwrite('product_20140811.nc','normmax', grandmax);
  
-nccreate('product_20140811.nc','combined',...
+nccreate('../data/product_20140811.nc','combined',...
          'Dimensions', {'time', inf, 'lat', length(qx(1,:)), 'lon', length(qy(:,1))});
 
-%%
+%% run filter
 
-% nRuns = 100;
 k5 = 0;
 for curStep = 150:nRuns
     curStep
-    
-%%%%%%%%%%%%%%%%%%
     clear Mt;
     Mt(:,1) = repmat(lonNetScaled,size(radarTSeries{curStep},2),1);
     lvec = [];
@@ -237,18 +195,10 @@ for curStep = 150:nRuns
         end        
     else
         for i = 1:size(sampPos,1)
-%             particleWgtRad{curStep}(:,i) = sampInfo' * prvWgt0(:,i);
-%         end         
-%     end
-%     if exist('prvWgt0')
-%         for i = 1:size(sampPos,1)
             tmp = rand(size(sampInfo));
             particleWgtRad{curStep}(:,i) = sampInfo' * tmp/sum(tmp);
         end
     end
-%     else
-%         particleWgtRad{curStep} = savData{1,2};
-%     end
     
 	% find time frame where there is windshield-wiper measurement 
     wiperOnIdx = find(vehicleData(:,tStepIx) == curStep);
@@ -356,9 +306,7 @@ for curStep = 150:nRuns
                         else
                             gTruth(i_2) = Mt(i_2,3);
                         end
-    %                 end
                     misDetectLhd = misDetectLhd * (1-mvnpdf(M(i_2,1:2),M(rainIdx(out2),1:2),eye(2)*varPos)/mvnpdf([0 0],[0 0],eye(2)*varPos));
-                %else
                 else
                     misDetectLhd = 1;
                     gTruth(i_2)=Mt(i_2,3);
@@ -376,21 +324,18 @@ for curStep = 150:nRuns
             for j = 1:length(sampInfo)
                   infoLhdU{i}(j)=normpdf(sampInfo(j),Mt(i,3),varInfo)/normpdf(0,0,varInfo);
             end
-            %infoLhd{i} = (infoLhd{i}-1/max(gTruth)) * detectLhd(i)+ 1/max(gTruth);
             infoLhd{i} = infoLhd{i} * detectLhd(i)+ infoLhdU{i} * (1-detectLhd(i));
-            % direc-delta function approximation
+            % dirac-delta function approximation
             if all(infoLhd{i} == 0)
                 [~,idx_tmp] = min((repmat(gTruth(i,:),size(sampInfo,1),1) - sampInfo).^2);
                 infoLhd{i}(idx_tmp) = 1;
             end
         end
-		
 		% particle filtering
         for i = 1:size(sampPos,1)
             wgt2(:,i) = sirFilter(infoLhd{i}',prvWgt(:,i));
             prvWgt(:,i) = wgt2(:,i);                
         end
-
         for i = 1:size(sampPos,1)
             particleWgt(:,i) = sampInfo' * wgt2(:,i);
         end
@@ -402,85 +347,22 @@ for curStep = 150:nRuns
         [qx,qy,qz] = drawFigure(M,radarTSeries{curStep},dSamp);
         hold on;
         plot(M(nearPosUniq,1),M(nearPosUniq,2),'cd');
-        filestr = sprintf('./img_05/%03d.png', curStep);
-         saveas(gcf, filestr);
         A = reshape(permute(qz, [2 1]), [1 size(permute(qz, [2 1]))]);
-         ncwrite('product_20140811.nc','combined', A, [curStep 1 1]);
-         clf;
-         close;
+        ncwrite('../data/product_20140811.nc','combined', A, [curStep 1 1]);
+        clf;
+        close;
     else
         clear M;
         M(:,1) = qx(:);
         M(:,2) = qy(:);        
-        M(:,3) = Mt(:,3); %particleWgt'./max(sampInfo);
+        M(:,3) = Mt(:,3);
         set(gca,'color','none');
         [qx,qy,qz] = drawFigure(M,radarTSeries{curStep},dSamp);
         hold on;
         plot(M(nearPosUniq,1),M(nearPosUniq,2),'x');
-        filestr = sprintf('./img_05/%03d.png', curStep);
-         saveas(gcf, filestr);
-         A = reshape(permute(qz, [2 1]), [1 size(permute(qz, [2 1]))]);
-         ncwrite('product_20140811.nc','combined', A, [curStep 1 1]);
-         clf;
-         close;
+        A = reshape(permute(qz, [2 1]), [1 size(permute(qz, [2 1]))]);
+        ncwrite('../data/product_20140811.nc','combined', A, [curStep 1 1]);
+        clf;
+        close;
         invalid = 1;
     end   
-  
-	% save data...
-    savData{curStep+1,1} = sampPos;
-    savData{curStep+1,2} = particleWgt;
-    if exist('nearPosMedEx')
-        tmpComp1 = particleWgt./max(sampInfo);
-        tmpComp5 = particleWgtRad{curStep}./max(sampInfo);
-        tmpComp3 = tmpComp1(:,nearPosMedEx(:,1));
-        tmpComp6 = tmpComp5(:,nearPosMedEx(:,1));
-%         if all(tmpComp6 > 0)
-%             tmpComp4 = ones(size(tmpComp6));
-%         else
-%             tmpComp4 = zeros(size(tmpComp6));
-%         end
-%         if all(tmpComp3 > 0)
-%             tmpComp7 = ones(size(tmpComp3));
-%         else
-%             tmpComp7 = zeros(size(tmpComp3));
-%         end    
-        tmpComp2 = nearPosMedEx(:,3)';
-
-        if invalid == 0
-            k5 = k5 + 1;
-            correct1{k5} = tmpComp6; % only radar
-            correct2{k5} = tmpComp3; % fused
-            correct3{k5} = tmpComp2; % windshield wiper measurement of the car left out...
-%             if (length(find(tmpComp2)) == length(find(tmpComp4)))
-%                 correct1(k5) = 1;
-%             else
-%                 correct1(k5) = 0;
-%             end
-%             if (length(find(tmpComp2)) == length(find(tmpComp7)))
-%                 correct2(k5) = 1;
-%             else
-%                 correct2(k5) = 0;
-%             end        
-            correct1
-            correct2
-            correct3
-        end
-    end
-end
-
-
-a = [];
-for i = 150:211
-    wiperOnIdx = find(vehicleData(:,tStepIx) == i);
-    vehicleDataEff = vehicleData(wiperOnIdx,:);
-    a = [a; hist(vehicleDataEff(:,wiperIx),0:1:2:3)];
-end
-figure,
-plot(1:211,a');legend('0','1','2','3');
-xlabel('time step');ylabel('average WW intensity of the operating vehicles')
-
-
-
-for i = 150:211
-    [0 1 2 0]*a
-end
