@@ -159,13 +159,9 @@ timeHorz = 1:1+max(unique(vehicleData(:,tStepIx)));
 % if such time does at all exists,
 if ~isempty(timeHorz)
     for u1 = 1:length(timeHorz)     % for each time from the 'timeHorz'
-        
         curStep = timeHorz(u1)      % current time step
 
-        % generate belief matrix from radar to use for the case
-        % vehicle cannot see rain, i.e., with probability 1, vehicle cannot
-        % see rain
-        
+        %% unfiltered (but sampled) radar measurements for later use...
         clear Mt;
         Mt(:,1) = repmat(lonNetScaled,size(radarTSeries{curStep},2),1);
         lvec = [];
@@ -203,8 +199,7 @@ if ~isempty(timeHorz)
         clear M;
         M = [qx(:) qy(:) qz(:)];
         
-        % transform a belief matrix (radar) to weights
-        
+        % transform belief matrix (radar) to weights
         prvWgt0 = [];
         for i = 1:size(M,1)
             p0 = mvnpdf(sampInfo,M(i,3),varInfo)/sum(mvnpdf(sampInfo,M(i,3),varInfo)); 
@@ -236,7 +231,7 @@ if ~isempty(timeHorz)
             wiperInfo = [];        
             vehicleDataEff = vehicleData(wiperOnIdx,:);
             
-            % scale GPS locations to fit [0,1] x [0,1]
+            % scale GPS locations to fit [0, 1] x [0, 1]
             
             vehicleDataEff(:,lonIx)=(vehicleDataEff(:,lonIx)-min(lonNet))/(max(lonNet) - min(lonNet));
             vehicleDataEff(:,latIx)=(vehicleDataEff(:,latIx)-min(latNet))/(max(latNet) - min(latNet));
@@ -253,10 +248,12 @@ if ~isempty(timeHorz)
             
             vehicleDataEff = [vehicleDataEff nearPos'];
 
-            % find vehicle,trip ids with unique vehicle positions
+            % find unique vehicle positions
             
             [nearPosUniq, idv] = unique(nearPos);
 
+            % counter
+            
             k = 0;
             for i = 1:length(nearPosUniq)
                 
@@ -359,14 +356,12 @@ if ~isempty(timeHorz)
             M(:,2) = qy(:);        
             M(:,3) =particleWgt'./max(sampInfo);    
 
-            % find unique vehicle locations
-            
             nearPosUniqVal = [];
             for j = 1:length(nearPosUniq)
                 nearPosUniqVal = [nearPosUniqVal;[vehicleDataEff(find(vehicleDataEff(:,end) == nearPosUniq(j)),4) vehicleDataEff(find(vehicleDataEff(:,end) == nearPosUniq(j)),3)]];
             end
             
-            % save data
+            % save 
             savData{curStep+1,2} = M;                    
             savData{curStep+1,3} = nearPosUniqVal;
 

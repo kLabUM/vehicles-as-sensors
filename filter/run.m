@@ -30,7 +30,10 @@ for i = 1:length(updatedmap)
     drawFigure(updatedmap{i,1},radarData(:,:,i),dSamp);     % radar
     drawFigure(updatedmap{i,2},radarData(:,:,i),dSamp);     % product
     hold on;
-    plot(updatedmap{i,3}(:,1),updatedmap{i,3}(:,2),'ok')    % vehicle locations
+    if ~isempty(updatedmap{i,3})
+        plot(updatedmap{i,3}(:,1),updatedmap{i,3}(:,2),'ok')    % vehicle locations
+        hold on;
+    end
 end
 
 
