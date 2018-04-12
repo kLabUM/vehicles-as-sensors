@@ -10,7 +10,7 @@ varInfo = 0.001;     % how noisy the sensor is (e.g., 0: perfect) default 0.01..
 varPos = 0.01;       % decay as the distance between the windshield wiper measurement and the source of rain, increases...
 weight = 0.9;		 % weight on prior (e.g., if weight=1, it forgets about the prior measurements and only consider the new radar measurement, default: 0.9)
 
-vehicleData = csvread('../data/20140811_cameracombined_filtered.csv', 1, 1);
+vehicleData = csvread('../../data/20140811_cameracombined_filtered.csv', 1, 1);
 deviceIdIdx = 2 - 1;
 tripIx = 3 - 1;      
 latIx = 4 - 1;       
@@ -28,16 +28,16 @@ allVehicleID = unique(vehicleData(:,deviceIdIdx))';
 numExcludedVehicles = 0;
 excludedVehicleID = allVehicleID(1,randsample(1:length(allVehicleID),numExcludedVehicles));
 
-ncdisp('../data/data_20140811.nc');
-gageData = ncread('../data/data_20140811.nc','gage');
-radarData = ncread('../data/data_20140811.nc','radar');
-wiperData = ncread('../data/data_20140811.nc','wiper');
+ncdisp('../../data/data_20140811.nc');
+gageData = ncread('../../data/data_20140811.nc','gage');
+radarData = ncread('../../data/data_20140811.nc','radar');
+wiperData = ncread('../../data/data_20140811.nc','wiper');
 
 %set radar data to zero if it's NaN
 radarData(isnan(radarData)) = 1e-9;
 wiperData(isnan(wiperData)) = 0;
-lonNet = ncread('../data/data_20140811.nc','longitude');
-latNet = ncread('../data/data_20140811.nc','latitude');
+lonNet = ncread('../../data/data_20140811.nc','longitude');
+latNet = ncread('../../data/data_20140811.nc','latitude');
 
 %% load data
 % change scale (GPS locations -> [0, 1]x[0, 1]) % for the sake of convenience
@@ -135,16 +135,16 @@ nRuns = max(unique(vehicleData(:,end-2)));
 
 %% create netcdf
 % 
-nccreate('../data/product_20140811.nc','lat', 'Dimensions', {'lat', length(qx(1,:))});
+nccreate('../../data/product_20140811.nc','lat', 'Dimensions', {'lat', length(qx(1,:))});
 ncwrite('product_20140811.nc','lat', linspace(min(latNet), max(latNet), length(qx(1,:))));
  
-nccreate('../data/product_20140811.nc','lon', 'Dimensions', {'lon', length(qy(:,1))});
+nccreate('../../data/product_20140811.nc','lon', 'Dimensions', {'lon', length(qy(:,1))});
 ncwrite('product_20140811.nc','lon', linspace(min(lonNet), max(lonNet), length(qy(:,1))));
  
-nccreate('../data/product_20140811.nc','normmax');
+nccreate('../../data/product_20140811.nc','normmax');
 ncwrite('product_20140811.nc','normmax', grandmax);
  
-nccreate('../data/product_20140811.nc','combined',...
+nccreate('../../data/product_20140811.nc','combined',...
          'Dimensions', {'time', inf, 'lat', length(qx(1,:)), 'lon', length(qy(:,1))});
 
 %% run filter
@@ -348,7 +348,7 @@ for curStep = 150:nRuns
         hold on;
         plot(M(nearPosUniq,1),M(nearPosUniq,2),'cd');
         A = reshape(permute(qz, [2 1]), [1 size(permute(qz, [2 1]))]);
-        ncwrite('../data/product_20140811.nc','combined', A, [curStep 1 1]);
+        ncwrite('../../data/product_20140811.nc','combined', A, [curStep 1 1]);
         clf;
         close;
     else
@@ -361,7 +361,7 @@ for curStep = 150:nRuns
         hold on;
         plot(M(nearPosUniq,1),M(nearPosUniq,2),'x');
         A = reshape(permute(qz, [2 1]), [1 size(permute(qz, [2 1]))]);
-        ncwrite('../data/product_20140811.nc','combined', A, [curStep 1 1]);
+        ncwrite('../../data/product_20140811.nc','combined', A, [curStep 1 1]);
         clf;
         close;
         invalid = 1;
