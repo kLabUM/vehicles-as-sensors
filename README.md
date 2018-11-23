@@ -53,6 +53,7 @@ Code and data for "Vehicles as sensors: high accuracy precipitation maps from wi
   - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/rain_gages/KMIYPSIL14
   - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/rain_gages/KMIYPSIL5
 - Vehicle Data:
+(Note: In order to protect the privacy of the drivers, vehicle paths near drivers' private residences have been redacted)
   - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data_r/20140612.csv
   - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data_r/20140628.csv
   - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data_r/20140629.csv
