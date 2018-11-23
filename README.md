@@ -53,27 +53,25 @@ Code and data for "Vehicles as sensors: high accuracy precipitation maps from wi
   - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/rain_gages/KMIYPSIL14
   - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/rain_gages/KMIYPSIL5
 - Vehicle Data:
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data/20140612.csv
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data/20140628.csv
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data/20140629.csv
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data/20140701.csv
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data/20140805.csv
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data/20140811.csv
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data/20140819.csv
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data/20140820.csv
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data/20140821.csv
+  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data_r/20140612.csv
+  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data_r/20140628.csv
+  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data_r/20140629.csv
+  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data_r/20140701.csv
+  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data_r/20140805.csv
+  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data_r/20140811.csv
+  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data_r/20140819.csv
+  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data_r/20140820.csv
+  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/raw_data/vehicle_data_r/20140821.csv
 
 ### Processed Data
 - Camera data:
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/processed_data/camera_observations/camera_observations_1m.csv
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/processed_data/camera_observations/camera_observations_comparison.csv
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/processed_data/camera_observations/camera_validation.csv
+  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/processed_data/camera_observations_r/camera_observations_1m.csv
+  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/processed_data/camera_observations_r/camera_observations_comparison.csv
+  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/processed_data/camera_observations_r/camera_validation.csv
 - Radar data:
   - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/processed_data/radar/data_20140612.nc
   - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/processed_data/radar/data_20140628.nc
   - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/processed_data/radar/data_20140811.nc
-- Vehicle:
-  - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/processed_data/misc/20140811_vehicle_filtered.csv
 - Wiper-corrected product:
   - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/corrected_product/product_20140811_agg.nc
   - https://s3.us-east-2.amazonaws.com/vehicles-as-sensors/corrected_product/product_20140811_nocars.nc
